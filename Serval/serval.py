@@ -70,6 +70,7 @@ class Serval(object):
 
     LINE_SELECTION = "line"
     POLYGON_SELECTION = "polygon"
+    FREEHAND_SELECTION = "freehand"
     RGB = "RGB"
     SINGLE_BAND = "Single band"
 
@@ -307,6 +308,13 @@ class Serval(object):
             callback=self.activate_polygon_selection,
             add_to_toolbar=self.sel_toolbar,
             checkable=True, )
+        
+        self.freehand_select_btn = self.add_action(
+            'select_freehand.svg',
+            text="Select Raster Cells by Freehand",
+            callback=self.activate_freehand_selection,
+            add_to_toolbar=self.sel_toolbar,
+            checkable=True, )
 
         self.selection_from_layer_btn = self.add_action(
             'select_from_layer.svg',
@@ -472,6 +480,9 @@ class Serval(object):
 
     def activate_polygon_selection(self):
         self.set_selection_tool(self.POLYGON_SELECTION)
+        
+    def activate_freehand_selection(self):
+        self.set_selection_tool(self.FREEHAND_SELECTION)
 
     def update_selection_tool(self):
         """Reactivate the selection tool with updated line width and units."""
@@ -479,6 +490,8 @@ class Serval(object):
             self.activate_line_selection()
         elif self.selection_mode == self.POLYGON_SELECTION:
             self.activate_polygon_selection()
+        elif self.selection_mode == self.FREEHAND_SELECTION:
+            self.activate_freehand_selection()
         else:
             pass
 
