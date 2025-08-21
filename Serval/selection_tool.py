@@ -17,6 +17,7 @@ class RasterCellSelectionMapTool(QgsMapTool):
     REMOVE_FROM_SELECTION = "Remove from selection"
     LINE_SELECTION = "line"
     POLYGON_SELECTION = "polygon"
+    FREEHAND_SELECTION = "freehand"
 
     def __init__(self, iface, uc, raster, debug=False):
         super(RasterCellSelectionMapTool, self).__init__(iface.mapCanvas())
@@ -141,7 +142,13 @@ class RasterCellSelectionMapTool(QgsMapTool):
     def canvasMoveEvent(self, e):
         if self.current_points is None:
             return
-        self.current_rubber_update(self.toMapCoordinates(e.pos()))
+        if self.mode == self.FREEHAND_SELECTION and self.is_drawing:
+            cur_pos = self.toMapCoordinates(e.pos())
+            self.current_points.append(cur_pos)
+            self.current_rubber_update(cur_position=cur_pos)
+        
+        else:
+            self.current_rubber_update(self.toMapCoordinates(e.pos()))
         self.last_pos = self.toMapCoordinates(e.pos())
 
     def keyPressEvent(self, e):
@@ -165,6 +172,7 @@ class RasterCellSelectionMapTool(QgsMapTool):
             if self.logger:
                 self.logger.debug(f"Right mouse button in mode: {self.selection_mode}")
             self.update_selection()
+            self.is_drawing = False
             return
         if e.button() != Qt.LeftButton:
             return
@@ -175,6 +183,7 @@ class RasterCellSelectionMapTool(QgsMapTool):
         else:
             self.current_points.append(cur_pos)
         self.current_rubber_update(cur_position=cur_pos)
+        self.is_drawing = True
 
     def update_selection(self):
         if self.logger:
